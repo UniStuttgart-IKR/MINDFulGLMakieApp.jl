@@ -1,0 +1,13 @@
+name = "MINDFulGLMakieApp"
+uuid = "fe64369a-5250-4e78-869b-a80445f84163"
+authors = ["fchrstou <filippos.christou@ikr.uni-stuttgart.de> and contributors"]
+version = "1.0.0-DEV"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
