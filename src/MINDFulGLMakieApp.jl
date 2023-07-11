@@ -20,6 +20,7 @@ module MINDFulGLMakieApp
     function generate_control_panel!(fig)
         fig[1, 1][1:2, 1:2] = GridLayout()
 
+
     end
 
     function add_interactors_to_control_panel(fig)
