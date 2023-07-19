@@ -60,6 +60,7 @@ function generate_ibns(axis; pos = 0)
             return p
         end
     else
+        #println(pos)
         p = ibnplot!(axis, myibns[pos])
         return p
 

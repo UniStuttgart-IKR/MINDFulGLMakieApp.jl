@@ -32,7 +32,6 @@ function add_interactors_to_control_panel(fig; draw_fullscreen_button=true, draw
         for i in 1:2
             for j in 1:2
                 on(draw_options_buttons[i, j].clicks) do b
-                    #println()
                     if ibn_button_observable["states"][[1 2; 3 4][i, j]][] == false
                         
                         
@@ -59,12 +58,19 @@ function add_interactors_to_control_panel(fig; draw_fullscreen_button=true, draw
 
         end
 
+        menu_fullscreen =subgl[1, 2][1, 1] =  Menu(fig, options = [1,2,3,4])
+        
+        on(menu_fullscreen.selection) do s
+            menu_number[] = s
+        end
+
+
 
 
 
     end
 
-    subgl[1, 2][1, 1] = fullscreen_button = Button(fig, width=100, label="Fullscreen")
+    subgl[1, 2][2, 1] = fullscreen_button = Button(fig, width=100, label="Fullscreen")
     #         subgl[1, 2][1,2] = fullscreen_button = Button(fig, width = 100, label = "Side by side")
     #         subgl[1, 2][2,1] = fullscreen_button = Button(fig, width = 100, label = "Pop out")
 
@@ -83,6 +89,13 @@ function add_interactors_to_control_panel(fig; draw_fullscreen_button=true, draw
 end
 
 function draw_graph(type_of_graph, position, fig, graphs; fullscreen=false)
+    #if type of graph is int 
+    if fullscreen == false
+        fullscreen_graph_information[[1 3 ; 2 4][position[1], position[2]]]["args"]["ibn_type"] = type_of_graph
+    end
+
+
+
     if type_of_graph == "sine"
 
         #frequency = observable_frequncies[1][]
@@ -92,7 +105,6 @@ function draw_graph(type_of_graph, position, fig, graphs; fullscreen=false)
 
         #fig[position[1], position[2]] = graphs[[1 3 ; 2 4][position[1], position[2]]][] =  Axis(fig[position[1], position[2]], alignmode = Outside(50))
         #lines!(xs, sinecurve)
-
     elseif type_of_graph == 0
         a = Axis(fig[position[1], position[2]])
         graphs[[1 3; 2 4][position[1], position[2]]][] = a
@@ -101,20 +113,19 @@ function draw_graph(type_of_graph, position, fig, graphs; fullscreen=false)
     else
         a = Axis(fig[position[1], position[2]])
         graphs[[1 3; 2 4][position[1], position[2]]][] = a
-        p = generate_ibns(a; pos=ibn_button_observable["selected"][])
+        p = generate_ibns(a; pos=type_of_graph)
+        println(type_of_graph)
 
-        if type_of_graph != 0
-            println(type_of_graph)
-
+        if type_of_graph != 0 && fullscreen == false && ibn_button_observable["selected"][] != 0
             button_colours["draw_option_buttons"][ibn_button_observable["selected"][]][] = gray_colour
             ibn_button_observable["states"][ibn_button_observable["selected"][]][] = false
             ibn_button_observable["selected"][] = 0
+
         end
         
 
 
     end
-
 
 end
 
@@ -133,6 +144,8 @@ function initialize_listeners_control_panel(fig, draw_buttons, graphs; draw_butt
                 draw_graph(ibn_button_observable["selected"][], [(1, 1), (2, 1), (1, 2), (2, 2)][i], fig, graphs)
 
                 fullscreen_graph_information[i]["shown"] = true
+                #fullscreen_graph_information[i]["args"]["ibn_type"] = ibn_button_observable["selected"][]
+                
 
             else
 
@@ -167,10 +180,11 @@ function initialize_fullscreen_listeners(fig, fullscreen_button, fullscreen_butt
     end
 end
 
-function enter_fullscreen(fig, graphs, pos)
-
-
-    draw_graph(0, [(1, 1), (2, 1), (1, 2), (2, 2)][2], fig, graphs)
+function enter_fullscreen(fig, graphs, pos_origin)
+    println("pos_origin:" * string(pos_origin, base=10))
+    println("IBN type:" * string(fullscreen_graph_information[pos_origin]["args"]["ibn_type"], base=10))
+    println(fullscreen_graph_information)
+    draw_graph(fullscreen_graph_information[pos_origin]["args"]["ibn_type"], (2,1), fig, graphs, fullscreen=true)
 end
 
 function exit_fullscreen()
@@ -185,8 +199,13 @@ function main(fig)
     side_by_side_button_observable = Observable(false)
     pop_out_button_observable = Observable(false)
 
-    global fullscreen_graph_information = [Dict("args" => [], "shown" => false) for i in 1:4]
+    global menu_fullscreen = 0
+    global menu_number = Observable(1)
 
+
+    global fullscreen_graph_information = [Dict("args" => Dict("ibn_type" => 0), "shown" => false) for i in 1:4]
+
+    #global graph_information_normal_mode = Dict("graphs" => [Dict("args" => Dict()) for i in 1:4 ])
 
     global ibn_button_observable = Dict("selected" => Observable(0), "states" => [Observable(false) for i in 1:4])
     global button_colours = Dict("draw_option_buttons" => [Observable(gray_colour) for i in 1:4])
@@ -196,8 +215,6 @@ function main(fig)
 
     generate_control_panel!(fig)
 
-    #println(fig[1, 1])
-
     draw_buttons, fullscreen_button = add_interactors_to_control_panel(fig)
 
     draw_button_clicked = initialize_listeners_control_panel(fig, draw_buttons, graphs)
@@ -206,13 +223,15 @@ function main(fig)
     colsize!(fig.layout, 1, Relative(0.45))
     rowsize!(fig.layout, 1, Relative(0.45))
 
+    colsize!(fig.layout, 2, Relative(0.45))
+    rowsize!(fig.layout, 2, Relative(0.45))
+
 
 
 
     #fullscreen listener
     on(fullscreen_button_obversable) do s
 
-        println(draw_button_clicked)
         if fullscreen_button_obversable[] == true
             #wants to go in fs
             delete!(draw_buttons[1])
@@ -232,7 +251,14 @@ function main(fig)
             #initialize_listeners_control_panel(fig, tb, draw_buttons, graphs, draw_button_clicked)
             initialize_fullscreen_listeners(fig, fullscreen_button, fullscreen_button_obversable)
 
-            #still need to decide what graph to "keep"
+            
+            pos_origin = 0
+            for (i, g) in enumerate(graphs)
+                if g[] != false
+                    pos_origin = i
+                    break  
+                end
+            end
 
             for g in graphs
                 try
@@ -241,11 +267,13 @@ function main(fig)
                 end
             end
 
-
-            enter_fullscreen(fig, graphs, 2)
+            enter_fullscreen(fig, graphs, menu_number[])
 
             colsize!(fig.layout, 1, Relative(0.99))
-            rowsize!(fig.layout, 1, Fixed(100))
+            rowsize!(fig.layout, 1, Relative(0.1))
+
+            colsize!(fig.layout, 2, Fixed(0))
+            rowsize!(fig.layout, 2, Relative(0.9))
 
 
         else
@@ -266,7 +294,7 @@ function main(fig)
 
             for i in 1:size(fullscreen_graph_information)[1]
                 if fullscreen_graph_information[i]["shown"] == true
-                    draw_graph(0, [(1, 1), (2, 1), (1, 2), (2, 2)][i], fig, graphs)
+                    draw_graph(fullscreen_graph_information[i]["args"]["ibn_type"], [(1, 1), (2, 1), (1, 2), (2, 2)][i], fig, graphs)
                 end
 
             end
@@ -274,6 +302,9 @@ function main(fig)
 
             colsize!(fig.layout, 1, Relative(0.45))
             rowsize!(fig.layout, 1, Relative(0.45))
+
+            colsize!(fig.layout, 2, Relative(0.45))
+            rowsize!(fig.layout, 2, Relative(0.45))
 
 
         end
