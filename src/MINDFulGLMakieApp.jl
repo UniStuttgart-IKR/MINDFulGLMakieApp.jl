@@ -13,6 +13,7 @@ module MINDFulGLMakieApp
 
     include("MINDFulGraphs.jl")
     include("functions.jl")
+    include("HelpFunctions.jl")
 
 
 end

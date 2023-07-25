@@ -13,3 +13,7 @@ function run()
     MFA.startup()
 end
 
+function test()
+    graphs = MFA.get_graph_names()
+end
+
