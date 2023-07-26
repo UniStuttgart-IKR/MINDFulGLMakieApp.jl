@@ -97,7 +97,7 @@ function draw_graph(type_of_graph, position, member_variables, topology; fullscr
         p = generate_ibns(a, topology)
 
     else
-        a = Axis(member_variables.fig[position[1], position[2]])
+        a = Axis(member_variables.fig[position[1], position[2]], title="Graph " * string([1 3; 2 4][position[1], position[2]]) * ", " * "Topology: " * topology * ", IBN Index: " * string(type_of_graph))
         member_variables.graphs[[1 3; 2 4][position[1], position[2]]][] = a
         p = generate_ibns(a, topology; pos=type_of_graph)
 
@@ -287,10 +287,10 @@ function main(fig)
             enter_fullscreen(member_variables, member_variables.menu_number[])
 
             colsize!(member_variables.fig.layout, 1, Relative(0.99))
-            rowsize!(member_variables.fig.layout, 1, Relative(0.1))
+            rowsize!(member_variables.fig.layout, 1, Relative(0.05))
 
             colsize!(member_variables.fig.layout, 2, Fixed(0))
-            rowsize!(member_variables.fig.layout, 2, Relative(0.9))
+            rowsize!(member_variables.fig.layout, 2, Relative(0.95))
 
 
         else
