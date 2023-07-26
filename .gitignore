@@ -1,1 +1,11 @@
 /Manifest.toml
+/.idea
+/.vscode
+/data
+/src/test.jl
+/src/test2.jl
+/src/test3.jl
+/test/data
+/test/Manifest.toml
+/test/Project.toml
+/MINDFulMakieApp.iml
