@@ -31,7 +31,7 @@ Or make it fullscreen.
 - [@Niels1006](https://www.github.com/niels1006)
 
 
-## Appendix
+## Credits
 
 - [MINDFul.jl](https://github.com/UniStuttgart-IKR/MINDFul.jl)
 - [MINDFulMakie.jl](https://github.com/UniStuttgart-IKR/MINDFulMakie.jl)
