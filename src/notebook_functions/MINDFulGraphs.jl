@@ -11,8 +11,8 @@ using MINDFul, GraphIO, NestedGraphsIO, NestedGraphs, Graphs, MetaGraphs
 
 using MINDFulMakie, GLMakie, Unitful
 
-function get_ibn_size(topology)
-     topology *= ".graphml"
+function get_subnet_amount(topology)
+    topology *= ".graphml"
 
     MINDF = MINDFul
     defaultlinecards() = [MINDF.LineCardDummy(10, 100, 26.72), MINDF.LineCardDummy(2, 400, 29.36), MINDF.LineCardDummy(1, 1000, 31.99)]
@@ -52,10 +52,10 @@ function get_ibn_size(topology)
             myibns = MINDFul.nestedGraph2IBNs!(simgraph)
         end
 
-    return size(myibns)
+    return size(myibns)[1]
 end
 
-function generate_ibns(axis, topology; pos=0)
+function generate_ibns(axis, topology, graph_type; pos=0, intent_args=false)
     topology *= ".graphml"
 
 
@@ -102,33 +102,58 @@ function generate_ibns(axis, topology; pos=0)
 
     #println(length(myibns))
 
-    if pos == 0
-        let
-            p = ibnplot!(axis, myibns)
-            #hidedecorations!(a)
+    #return basic ibn graph
+    if graph_type == "ibn"
+        if pos == 0
+            let
+                p = ibnplot!(axis, myibns)
+                #hidedecorations!(a)
+                return p, length(myibns)
+            end
+        else
+            #println(pos)
+            p = ibnplot!(axis, myibns[pos])
             return p, length(myibns)
+
+
         end
     else
-        #println(pos)
-        p = ibnplot!(axis, myibns[pos])
-        return p, length(myibns)
+        println(intent_args)
+        myintent = ConnectivityIntent((myibns[intent_args["node_1_ibn"]].id, intent_args["node_1"]), (myibns[intent_args["node_2_ibn"]].id, intent_args["node_2"]), intent_args["speed"])
+        idi = addintent!(myibns[pos], myintent)
+        nexttime() = MINDF.COUNTER("time")u"hr"
 
+        deploy!(myibns[intent_args["node_1_ibn"]], idi, MINDF.docompile, MINDF.SimpleIBNModus(), MINDF.shortestavailpath!; time=nexttime())
+
+        if pos == 0
+            tmp_myibns = myibns
+        else
+            tmp_myibns = myibns[pos]
+        end
+
+        if graph_type == "Unin Tree"
+            p = intentplot!(axis, tmp_myibns, idi)
+            return p
+        else
+
+            if graph_type == "Tree"
+
+                deploy!(myibns[pos], idi, MINDF.doinstall, MINDF.SimpleIBNModus(), MINDF.directinstall!; time=nexttime());
+                p = intentplot!(axis, myibns[pos], idi)
+                return p
+            else
+                p = ibnplot!(axis, myibns, intentidx=[idi])
+
+                println(fieldnames(typeof(myibns[1].ngr)))
+                println(myibns[1].ngr.vmap)
+                
+
+                return p
+            end
+
+        end
 
     end
-
-
-    #= let
-        f = Figure()
-        a,p = ibnplot(f[1,1], myibns[1]; axis=(title="myibns[1]",))
-        hidedecorations!(a)
-        a,p = ibnplot(f[1,2], myibns[2]; axis=(title="myibns[2]",))
-        hidedecorations!(a)
-        a,p = ibnplot(f[2,2], myibns[3]; axis=(title="myibns[3]",))
-        hidedecorations!(a)
-        a,p = ibnplot(f[2,1], myibns[4]; axis=(title="myibns[4]",))
-        hidedecorations!(a)
-        f
-    end =#
 
 
 end

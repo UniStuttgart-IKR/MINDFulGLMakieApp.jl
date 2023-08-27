@@ -10,10 +10,14 @@ export MINDFulGLMakieApp
 
 module MINDFulGLMakieApp
     using GLMakie
+    #using DataStructures
 
-    include("MINDFulGraphs.jl")
-    include("functions.jl")
     include("HelpFunctions.jl")
+    include("functions2.jl")
+    include("control_panels/intents/Interactions.jl")
+    include("control_panels/drawing/Interactions.jl")
+    include("notebook_functions/MINDFulGraphs.jl")
+    include("notebook_functions/IntentDAG.jl")
 
 
 end
