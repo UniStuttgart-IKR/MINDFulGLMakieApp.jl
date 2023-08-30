@@ -10,7 +10,10 @@ export MINDFulGLMakieApp
 
 module MINDFulGLMakieApp
     using GLMakie
+    using RemoteREPL
     #using DataStructures
+
+    @async serve_repl()
 
     include("HelpFunctions.jl")
     include("functions2.jl")
@@ -18,6 +21,5 @@ module MINDFulGLMakieApp
     include("control_panels/drawing/Interactions.jl")
     include("notebook_functions/MINDFulGraphs.jl")
     include("notebook_functions/IntentDAG.jl")
-
-
+    
 end

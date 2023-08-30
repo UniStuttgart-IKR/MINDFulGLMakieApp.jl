@@ -31,9 +31,9 @@ function init_control_panel_intents(member_variables)
     subnet_amount = get_subnet_amount(member_variables.interactables["intents"]["menus"]["topology"].selection[])
     member_variables.interactables["intents"]["menus"]["subnet"] = Menu(fig[1, 1][1, 1][2, 0:1], options=[i for i in 1:subnet_amount],
         default=member_variables.interactables_observables["intents"]["menus"]["subnet"][])
-    member_variables.interactables["intents"]["menus"]["node_1"] = Menu(fig[1, 1][1, 1][2, 2], options=[1, 2, 3, 4], default=member_variables.interactables_observables["intents"]["menus"]["node_1"][])
+    member_variables.interactables["intents"]["menus"]["node_1"] = Menu(fig[1, 1][1, 1][2, 2], options=[i for i in 1:10], default=member_variables.interactables_observables["intents"]["menus"]["node_1"][])
     member_variables.interactables["intents"]["menus"]["node_1_subnet"] = Menu(fig[1, 1][1, 1][2, 3], options=[i for i in 1:subnet_amount], default=member_variables.interactables_observables["intents"]["menus"]["node_1_subnet"][])
-    member_variables.interactables["intents"]["menus"]["node_2"] = Menu(fig[1, 1][1, 1][3, 2], options=[1, 2, 3, 4], default=member_variables.interactables_observables["intents"]["menus"]["node_2"][])
+    member_variables.interactables["intents"]["menus"]["node_2"] = Menu(fig[1, 1][1, 1][3, 2], options=[i for i in 1:10], default=member_variables.interactables_observables["intents"]["menus"]["node_2"][])
     member_variables.interactables["intents"]["menus"]["node_2_subnet"] = Menu(fig[1, 1][1, 1][3, 3], options=[i for i in 1:subnet_amount], default=member_variables.interactables_observables["intents"]["menus"]["node_2_subnet"][])
     member_variables.interactables["intents"]["menus"]["speed"] = Menu(fig[1, 1][1, 1][4, 2:3], options=[1, 2, 3, 4], default=member_variables.interactables_observables["intents"]["menus"]["speed"][])
 

@@ -119,11 +119,11 @@ function generate_ibns(axis, topology, graph_type; pos=0, intent_args=false)
         end
     else
         println(intent_args)
-        myintent = ConnectivityIntent((myibns[intent_args["node_1_ibn"]].id, intent_args["node_1"]), (myibns[intent_args["node_2_ibn"]].id, intent_args["node_2"]), intent_args["speed"])
+        myintent = ConnectivityIntent((myibns[intent_args["node_1_subnet"]].id, intent_args["node_1"]), (myibns[intent_args["node_2_subnet"]].id, intent_args["node_2"]), intent_args["speed"])
         idi = addintent!(myibns[pos], myintent)
         nexttime() = MINDF.COUNTER("time")u"hr"
 
-        deploy!(myibns[intent_args["node_1_ibn"]], idi, MINDF.docompile, MINDF.SimpleIBNModus(), MINDF.shortestavailpath!; time=nexttime())
+        deploy!(myibns[intent_args["node_1_subnet"]], idi, MINDF.docompile, MINDF.SimpleIBNModus(), MINDF.shortestavailpath!; time=nexttime())
 
         if pos == 0
             tmp_myibns = myibns
@@ -141,7 +141,7 @@ function generate_ibns(axis, topology, graph_type; pos=0, intent_args=false)
                 deploy!(myibns[pos], idi, MINDF.doinstall, MINDF.SimpleIBNModus(), MINDF.directinstall!; time=nexttime());
                 p = intentplot!(axis, myibns[pos], idi)
                 return p
-            else
+            elseif graph_type == "Visualization"
                 p = ibnplot!(axis, myibns, intentidx=[idi])
 
                 println(fieldnames(typeof(myibns[1].ngr)))

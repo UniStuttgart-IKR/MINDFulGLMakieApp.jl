@@ -5,6 +5,7 @@ Base.@kwdef mutable struct MemberVariables
     fig
 
     graphs
+    fullscreen_graph
 
     interactables
     interactables_observables
@@ -12,6 +13,9 @@ Base.@kwdef mutable struct MemberVariables
     displayed_graphs
 
     loaded_intents
+
+
+    grid_length
 
 end
 
@@ -35,6 +39,13 @@ function delete_all_interactables_from_screen(member_variables)
             end
         end
     end
+end
+
+function delete_all_graphs_from_screen(member_variables)
+    for (k, v) in member_variables.graphs
+        delete!(member_variables.graphs[k]["args"]["a"])
+    end
+
 end
 
 
@@ -73,8 +84,8 @@ end
 
 
 
-function main(fig)
-    member_variables = init_member_variables(fig)
+function main!(fig)
+    member_variables = init_member_variables!(fig)
 
     generate_grid_layout!(fig)
     initialize_control_panel(member_variables)
@@ -83,16 +94,48 @@ function main(fig)
         initialize_control_panel(member_variables)
     end
 
+    on(member_variables.interactables_observables["drawing"]["buttons"]["fullscreen"]) do s
+        pos = member_variables.interactables["drawing"]["menus"]["draw_position"].selection[]
+
+        delete_all_interactables_from_screen(member_variables)
+        delete_all_graphs_from_screen(member_variables)
+
+        member_variables.interactables["drawing"]["buttons"]["end_fullscreen"] = Button(fig[1, 1], label="End Fullscreen")
+        on(member_variables.interactables["drawing"]["buttons"]["end_fullscreen"].clicks) do r
+            member_variables.interactables_observables["drawing"]["buttons"]["end_fullscreen"][] = !member_variables.interactables_observables["drawing"]["buttons"]["end_fullscreen"][]
+        end
+
+
+        draw(member_variables.graphs[pos]["args"], member_variables; fullscreen=true)
+
+        #GLMakie.trim!(fig.layout)
+
+    end
+
+    on(member_variables.interactables_observables["drawing"]["buttons"]["end_fullscreen"]) do s
+        delete!(member_variables.fullscreen_graph[1])
+
+
+        initialize_control_panel(member_variables)
+
+        for (k,v) in member_variables.graphs 
+            draw(member_variables.graphs[k]["args"], member_variables)
+        end
+    end
+
+    return member_variables.fig
 
 
 end
 
-function init_member_variables(fig)
+function init_member_variables!(fig)
+    #
+
     member_variables = MemberVariables(
         fig=fig,
-        graphs=Dict(
-            
+        graphs=Dict(           #
         ),
+        fullscreen_graph=Dict(),
         interactables=Dict(
             "general" => Dict(
                 "menu" => Menu(fig[1, 1][1, 1][1, 1], options=["a"])
@@ -140,7 +183,14 @@ function init_member_variables(fig)
                     "speed" => Observable(1),
                     "intent_list" => Observable(2),
                     "loaded_intents" => Observable("default intent")
-                ))
+                )
+            ),
+            "drawing" => Dict(
+                "buttons" => Dict(
+                    "fullscreen" => Observable(false),
+                    "end_fullscreen" => Observable(false)
+                )
+            )
         ), displayed_graphs=nothing,
         loaded_intents=Dict(
             "default intent" =>
@@ -154,7 +204,8 @@ function init_member_variables(fig)
                     "subnet" => 1,
                     "rolling_number" => time()
                 )
-        )
+        ),
+        grid_length = 2
     )
 
     return member_variables
@@ -162,7 +213,7 @@ end
 
 function startup()
     fig = Figure(resolution=(1600, 1000))
-    main(fig)
+    fig_configured = main!(fig)
 
-    fig
+    fig_configured
 end
