@@ -17,9 +17,11 @@ module MINDFulGLMakieApp
 
     include("HelpFunctions.jl")
     include("functions2.jl")
-    include("control_panels/intents/Interactions.jl")
+    include("control_panels/intent_creation/Interactions.jl")
     include("control_panels/drawing/Interactions.jl")
+    include("control_panels/intent_actions/IntentActions.jl")
     include("notebook_functions/MINDFulGraphs.jl")
     include("notebook_functions/IntentDAG.jl")
+    include("notebook_functions/SimpleNotebook.jl")
     
 end
