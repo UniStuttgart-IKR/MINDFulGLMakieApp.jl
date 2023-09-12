@@ -6,7 +6,7 @@ function get_graph_names()
 
 
     files_wo_ending = [replace(files[i], ".graphml" => "") for i in 1:length(files)]
-    
+
     print(files_wo_ending)
     return files_wo_ending
 end
@@ -22,3 +22,26 @@ function get_pos1_pos2(pos, grid_length)
         return [2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4][pos], [1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4][pos]
     end
 end
+
+function parse_int_from_string(str)
+    try
+        parsed = parse(Int64, str)
+        return parsed
+    catch
+        return nothing
+    end
+end
+
+function set_menu_selected(menu; i=1)
+    menu.i_selected = 1
+end
+
+function testing()
+    ar = Any[1]
+
+    append!(ar, ["1"])
+
+    println(ar)  
+end
+
+export testing

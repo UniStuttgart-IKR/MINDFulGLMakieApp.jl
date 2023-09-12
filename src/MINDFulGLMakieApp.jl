@@ -13,7 +13,7 @@ module MINDFulGLMakieApp
     using RemoteREPL
     #using DataStructures
 
-    @async serve_repl()
+    #@async serve_repl()
 
     include("HelpFunctions.jl")
     include("functions2.jl")

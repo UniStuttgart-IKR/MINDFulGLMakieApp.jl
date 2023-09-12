@@ -11,8 +11,15 @@ using MINDFul, GraphIO, NestedGraphsIO, NestedGraphs, Graphs, MetaGraphs
 
 using MINDFulMakie, GLMakie, Unitful
 
-function get_subnet_amount(topology)
-    topology *= ".graphml"
+function get_subnet_amount(topology, member_variables)
+    path = ""
+    for x in member_variables.topologies
+        if x["name"] == topology
+            path = x["path"]
+        end
+    end
+
+    #topology *= ".graphml"
 
     MINDF = MINDFul
     defaultlinecards() = [MINDF.LineCardDummy(10, 100, 26.72), MINDF.LineCardDummy(2, 400, 29.36), MINDF.LineCardDummy(1, 1000, 31.99)]
@@ -36,7 +43,7 @@ function get_subnet_amount(topology)
     myibns =
         let
             # read in the NestedGraph
-            globalnet = open(joinpath("data/" * topology)) do io
+            globalnet = open(path) do io
                 loadgraph(io, "main", GraphIO.GraphML.GraphMLFormat(), NestedGraphs.NestedGraphFormat())
             end
 
@@ -138,7 +145,7 @@ function generate_ibns(axis, topology, graph_type; pos=0, intent_args=false)
 
             if graph_type == "Tree"
 
-                deploy!(myibns[pos], idi, MINDF.doinstall, MINDF.SimpleIBNModus(), MINDF.directinstall!; time=nexttime());
+                deploy!(myibns[pos], idi, MINDF.doinstall, MINDF.SimpleIBNModus(), MINDF.directinstall!; time=nexttime())
                 p = intentplot!(axis, myibns[pos], idi)
                 return p
             elseif graph_type == "Visualization"
@@ -146,7 +153,7 @@ function generate_ibns(axis, topology, graph_type; pos=0, intent_args=false)
 
                 println(fieldnames(typeof(myibns[1].ngr)))
                 println(myibns[1].ngr.vmap)
-                
+
 
                 return p
             end

@@ -1,3 +1,12 @@
+struct Colors_
+    red
+    green
+end
+
+global colors = Colors_(
+    RGBf(1, 0, 0),
+    RGBf(39 / 255, 201 / 255, 104 / 255)
+)
 
 
 
@@ -17,12 +26,14 @@ Base.@kwdef mutable struct MemberVariables
 
 
     grid_length
+    topologies
 
 end
 
 function generate_grid_layout!(fig)
-    fig[1:2, 1:2] = GridLayout()
+    gl = fig[1:2, 1:2] = GridLayout()
     fig[1, 1][1:2, 1:2] = GridLayout()
+    return gl
 end
 
 function delete_all_interactables_from_screen(member_variables)
@@ -33,7 +44,7 @@ function delete_all_interactables_from_screen(member_variables)
                 delete!(v2)
             else
                 for (k3, v3) in v2
-                    if typeof(v3) in [Makie.Menu, Makie.Button,Makie.Textbox]
+                    if typeof(v3) in [Makie.Menu, Makie.Button, Makie.Textbox]
                         delete!(v3)
                     end
                 end
@@ -57,15 +68,28 @@ function initialize_control_panel(member_variables)
     delete_all_interactables_from_screen(member_variables)
 
     fig = member_variables.fig
-    member_variables.interactables["general"]["menu"] = Menu(fig[1, 1][1, 1][1, 0:1], options=["intents", "intent_actions", "draw"], default=member_variables.interactables_observables["general"]["menu"][])
+    member_variables.interactables["general"]["menu"] = Menu(fig[1, 1][1, 1][1, 0:1], options=["Intent Creation", "Intent Actions", "Draw"], default=member_variables.interactables_observables["general"]["menu"][])
 
     # check what type of control panel needs to be displayed 
-    if member_variables.interactables_observables["general"]["menu"][] == "intents"
+
+    if member_variables.interactables_observables["general"]["menu"][] == "Intent Creation"
         init_control_panel_intents(member_variables)
-    elseif member_variables.interactables_observables["general"]["menu"][] == "draw"
-        init_control_panel_drawing(member_variables)
-    elseif member_variables.interactables_observables["general"]["menu"][] == "intent_actions"
-        init_control_panel_intent_actions(member_variables)
+    elseif member_variables.interactables_observables["general"]["menu"][] == "Draw"
+        println(length(member_variables.loaded_intents))
+        if length(member_variables.loaded_intents) > 0
+            init_control_panel_drawing(member_variables)
+        else
+            member_variables.interactables_observables["general"]["menu"][] = "Intent Creation"
+            initialize_control_panel(member_variables)
+        end
+
+    elseif member_variables.interactables_observables["general"]["menu"][] == "Intent Actions"
+        if length(member_variables.loaded_intents) > 0
+            init_control_panel_intent_actions(member_variables)
+        else
+            member_variables.interactables_observables["general"]["menu"][] = "Intent Creation"
+            initialize_control_panel(member_variables)
+        end
     end
 
     #add listerners for observables
@@ -91,7 +115,12 @@ function main!(fig)
 
     member_variables = init_member_variables!(fig)
 
-    generate_grid_layout!(fig)
+    gl = generate_grid_layout!(fig)
+    gl_2 = GridLayout()
+    gl_hidden = GridLayout(bbox=BBox(-4000, -4000, -1000, -1000))
+
+    gl_hidden[1:2, 1:2] = gl_2
+
     initialize_control_panel(member_variables)
 
     on(member_variables.interactables_observables["general"]["menu"]) do s
@@ -100,32 +129,61 @@ function main!(fig)
 
     on(member_variables.interactables_observables["drawing"]["buttons"]["fullscreen"]) do s
         pos = member_variables.interactables["drawing"]["menus"]["draw_position"].selection[]
+        pos_1, pos_2 = get_pos1_pos2(pos, member_variables.grid_length)
 
-        delete_all_interactables_from_screen(member_variables)
-        delete_all_graphs_from_screen(member_variables)
+
+        member_variables.fig[2, 2], member_variables.fig[pos_1, pos_2] = content(member_variables.fig[pos_1, pos_2]), content(member_variables.fig[2, 2])
+
+
+        #member_variables.fullscreen_graph = copy(member_variables.graphs)
+
+
+        #println(pos_1, pos_2)
+        #
+
+        #gl_2[2,1] = fullscreen_graph
+        #gl_2[2,2] = fullscreen_graph
+
+
+        #delete_all_interactables_from_screen(member_variables)
+        #delete_all_graphs_from_screen(member_variables)
+
+        #member_variables.fig[2, 2] = fullscreen_graph
 
         member_variables.interactables["drawing"]["buttons"]["end_fullscreen"] = Button(fig[1, 1], label="End Fullscreen")
         on(member_variables.interactables["drawing"]["buttons"]["end_fullscreen"].clicks) do r
             member_variables.interactables_observables["drawing"]["buttons"]["end_fullscreen"][] = !member_variables.interactables_observables["drawing"]["buttons"]["end_fullscreen"][]
+            delete!(member_variables.interactables["drawing"]["buttons"]["end_fullscreen"])
+            #init_control_panel_drawing(member_variables)
+
+            #gl[pos_1, pos_2] = fullscreen_graph
+            member_variables.fig[1:2, 1:2] = gl
+            gl_hidden[1:2, 1:2] = gl_2
+
+            member_variables.fig[2, 2], member_variables.fig[pos_1, pos_2] = content(member_variables.fig[pos_1, pos_2]), content(member_variables.fig[2, 2])
         end
 
 
-        draw(member_variables.graphs[pos]["args"], member_variables; fullscreen=true)
 
-        #GLMakie.trim!(fig.layout)
+        member_variables.fig[1:2, 1:2] = gl_2
+        gl_hidden[1:2, 1:2] = gl
+
+        #draw(member_variables.graphs[pos]["args"], member_variables; fullscreen=true)
+
+        GLMakie.trim!(fig.layout)
 
     end
 
-    on(member_variables.interactables_observables["drawing"]["buttons"]["end_fullscreen"]) do s
-        delete!(member_variables.fullscreen_graph[1])
+    #= on(member_variables.interactables_observables["drawing"]["buttons"]["end_fullscreen"]) do s
+        #delete!(member_variables.fullscreen_graph[1])
 
-
+        delete!(member_variables.interactables["drawing"]["buttons"]["end_fullscreen"])
         initialize_control_panel(member_variables)
 
-        for (k, v) in member_variables.graphs
+        #= for (k, v) in member_variables.graphs
             draw(member_variables.graphs[k]["args"], member_variables)
-        end
-    end
+        end =#
+    end =#
 
 
     return member_variables.fig
@@ -161,7 +219,6 @@ function init_member_variables!(fig)
                     "loaded_intents" => Menu(fig[1, 1][1, 1][1, 1], options=["a"]),
                 ),
                 "textboxes" => Dict(
-
                 )
             ),
             "drawing" => Dict(
@@ -182,7 +239,7 @@ function init_member_variables!(fig)
         ),
         interactables_observables=Dict(
             "general" => Dict(
-                "menu" => Observable("intents")
+                "menu" => Observable("Intent Creation")
             ),
             "intents" => Dict(
                 "menus" => Dict(
@@ -208,14 +265,20 @@ function init_member_variables!(fig)
         ],
         ibns=[
         ],
-        grid_length=2
+        grid_length=2, topologies=[
+            Dict(
+                "name" => "4nets",
+                "relative" => false,
+                "path" => joinpath("data/" * "4nets.graphml")
+            )
+        ]
     )
 
     return member_variables
 end
 
 function startup()
-    fig = Figure(resolution=(1600, 1000))
+    fig = Figure(resolution=(1800, 1200))
     fig_configured = main!(fig)
     fig_configured
 

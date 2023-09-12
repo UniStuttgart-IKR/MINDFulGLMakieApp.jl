@@ -3,11 +3,20 @@ using MINDFul, GraphIO, NestedGraphsIO, NestedGraphs, Graphs, MetaGraphs
 using MINDFulMakie, GLMakie, Unitful
 
 
-function plot_mindful(plot_type, axis, ibn, idi)
+function plot_mindful(plot_type, axis, ibn, idi, domain)
     if plot_type == "intentplot"
-        intentplot!(axis, ibn[1], idi)
+        if domain == 0
+            intentplot!(axis, ibn, idi)
+        else
+            intentplot!(axis, ibn[domain], idi)
+        end
     elseif plot_type == "ibnplot"
-        ibnplot!(axis, ibn, intentidx=[idi])
+        if domain == 0
+            ibnplot!(axis, ibn, intentidx=[idi])
+        else
+            ibnplot!(axis, ibn[domain], intentidx=[idi])
+        end
+
     end
 end
 
@@ -22,12 +31,12 @@ function add_intent_to_framework(intent, ibn)
     return idi
 end
 
-function init_intent(n1, n1_sn, n2, n2_sn, speed, topology, sn; myibns=nothing)
+function init_intent(n1, n1_sn, n2, n2_sn, topology, sn; myibns=nothing)
     if myibns === nothing
         myibns = load_ibn(topology)
     end
     local myintent = create_intent(n1, n2, myibns[n1_sn], myibns[n2_sn])
-    local idi = add_intent_to_framework(myintent, myibns[1])
+    local idi = add_intent_to_framework(myintent, myibns[n1_sn])
     return idi, myibns
 end
 
@@ -51,24 +60,23 @@ end
 
 
 function load_ibn(topology)
-    myibns =
-        let
-            # read in the NestedGraph
-            globalnet = open(joinpath("data/" * topology * ".graphml")) do io
-                loadgraph(io, "main", GraphIO.GraphML.GraphMLFormat(), NestedGraphs.NestedGraphFormat())
-            end
 
-            # convert it to a NestedGraph compliant with the simulation specifications
-            simgraph = MINDF.simgraph(globalnet;
-                distance_method=MINDF.euclidean_dist,
-                router_lcpool=defaultlinecards(),
-                router_lccpool=defaultlinecardchassis(),
-                router_lcccap=3,
-                transponderset=defaulttransmissionmodules())
+    # read in the NestedGraph
+    globalnet = open(joinpath("data/" * topology * ".graphml")) do io
+        loadgraph(io, "main", GraphIO.GraphML.GraphMLFormat(), NestedGraphs.NestedGraphFormat())
+    end
 
-            # convert it to IBNs
-            myibns = MINDFul.nestedGraph2IBNs!(simgraph)
-        end
+    # convert it to a NestedGraph compliant with the simulation specifications
+    simgraph = MINDF.simgraph(globalnet;
+        distance_method=MINDF.euclidean_dist,
+        router_lcpool=defaultlinecards(),
+        router_lccpool=defaultlinecardchassis(),
+        router_lcccap=3,
+        transponderset=defaulttransmissionmodules())
+
+    # convert it to IBNs
+    myibns = MINDFul.nestedGraph2IBNs!(simgraph)
+
     return myibns
 end
 
@@ -91,14 +99,20 @@ defaulttransmissionmodules() = [MINDF.TransmissionModuleView("DummyFlexibleTrans
 nexttime() = MINDF.COUNTER("time")u"hr"
 
 
-function longestavailpath!(ibn::IBN, idagnode::IntentDAGNode{R}, ::MINDF.IntraIntent; time, k = 100) where {R<:ConnectivityIntent}
+function longestavailpath!(ibn::IBN, idagnode::IntentDAGNode{R}, ::MINDF.IntraIntent; time, k=100) where {R<:ConnectivityIntent}
     conint = getintent(idagnode)
     source = MINDF.localnode(ibn, getsrc(conint); subnetwork_view=false)
     dest = MINDF.localnode(ibn, getdst(conint); subnetwork_view=false)
 
     yenpaths = yen_k_shortest_paths(MINDF.getgraph(ibn), source, dest, MINDF.linklengthweights(ibn), k)
-	# call an internal function that picks the first available path
-	# use the first fil spectrum alocation algorithm as before (https://ieeexplore.ieee.org/document/6421472)
+    # call an internal function that picks the first available path
+    # use the first fil spectrum alocation algorithm as before (https://ieeexplore.ieee.org/document/6421472)
     MINDF.deployfirstavailablepath!(ibn, idagnode, reverse(yenpaths.paths), reverse(yenpaths.dists); spectrumallocfun=MINDF.firstfit, time)
     return getstate(idagnode)
+end
+
+
+function get_nodes_of_subdomain(ibn)
+    #println(fieldnames(typeof(ibn)))
+    return MINDFul.getmynodes(ibn)
 end
