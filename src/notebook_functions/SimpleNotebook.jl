@@ -31,9 +31,19 @@ function add_intent_to_framework(intent, ibn)
     return idi
 end
 
-function init_intent(n1, n1_sn, n2, n2_sn, topology, sn; myibns=nothing)
+function init_intent(n1, n1_sn, n2, n2_sn, topology, sn, member_variables; myibns=nothing)
+    top_dict = nothing
+
+    for top in member_variables.topologies
+        if top["name"] == topology
+            top_dict = top
+        end
+    end
+
+
+
     if myibns === nothing
-        myibns = load_ibn(topology)
+        myibns = load_ibn(top_dict["path"])
     end
     local myintent = create_intent(n1, n2, myibns[n1_sn], myibns[n2_sn])
     local idi = add_intent_to_framework(myintent, myibns[n1_sn])
@@ -71,10 +81,9 @@ function remove_intent(ibn, idi)
 end
 
 
-function load_ibn(topology)
-
+function load_ibn(topology_path)
     # read in the NestedGraph
-    globalnet = open(joinpath("data/" * topology * ".graphml")) do io
+    globalnet = open(joinpath(topology_path)) do io
         loadgraph(io, "main", GraphIO.GraphML.GraphMLFormat(), NestedGraphs.NestedGraphFormat())
     end
 
