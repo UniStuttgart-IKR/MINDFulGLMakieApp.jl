@@ -1,19 +1,19 @@
-#=
-MINDFulGLMakieApp:
-- Julia version: 1.9.1
-- Author: Niels
-- Date: 2023-07-8
-=#
-
-
 export MINDFulGLMakieApp
 
 module MINDFulGLMakieApp
     using GLMakie
+    using RemoteREPL
+    #using DataStructures
 
-    include("MINDFulGraphs.jl")
-    include("functions.jl")
-    include("HelpFunctions.jl")
+    #@async serve_repl()
 
-
+    include("etc/HelpFunctions.jl")
+    include("control_panels/PanelHandler.jl")
+    include("control_panels/intent_creation/Interactions.jl")
+    include("control_panels/drawing/Interactions.jl")
+    include("control_panels/intent_actions/IntentActions.jl")
+    include("control_panels/ui_options/UIOptions.jl")
+    include("notebook_functions/SimpleNotebook.jl")
+    include("notebook_functions/MINDFulGraphs.jl")
+    
 end
