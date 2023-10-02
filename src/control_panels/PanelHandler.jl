@@ -288,6 +288,9 @@ end
 function startup()
     fig = Figure(resolution=(1800, 1200))
     fig_configured = main!(fig)
-    fig_configured
+    display(fig_configured)
+    #readline()
 
 end
+
+export startup

@@ -3,7 +3,9 @@ export MINDFulGLMakieApp
 module MINDFulGLMakieApp
     using GLMakie
     using RemoteREPL
-    #using DataStructures
+    using MINDFul
+
+    const MINDF = MINDFul
 
     #@async serve_repl()
 
