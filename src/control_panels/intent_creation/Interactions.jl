@@ -94,6 +94,7 @@ function init_control_panel_intents(member_variables)
                 #parse(Int64, _t["speed"].stored_string[]),
                 _v["topology"].selection[],
                 _v["subnet"].selection[],
+                member_variables,
                 myibns=nothing)
 
             counter = 1
@@ -121,6 +122,7 @@ function init_control_panel_intents(member_variables)
                 #_v["speed"].selection[],
                 _v["topology"].selection[],
                 _v["subnet"].selection[],
+                member_variables,
                 myibns=member_variables.ibns[ibn_ar_index]["ibn"])
 
             intent_name = member_variables.ibns[ibn_ar_index]["name"] * ", " * string(idi.value, base=16)
@@ -189,7 +191,8 @@ function init_control_panel_intents(member_variables)
                     domain_i,
                     #2,
                     top,
-                    domain_i)
+                    domain_i,
+                    member_variables)
 
                 domain_amount = length(get_nodes_of_subdomain(ibn[domain_i]))
                 member_variables.interactables["intents"]["menus"][x].options[] = append!(Any[member_variables.interactables["intents"]["menus"][x].options[][1]], 1:domain_amount)
