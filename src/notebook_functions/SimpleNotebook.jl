@@ -58,6 +58,18 @@ function install_intent(ibn, idi)
     deploy!(ibn, idi, MINDF.doinstall, MINDF.SimpleIBNModus(), MINDF.directinstall!; time=nexttime())
 end
 
+function uninstall_intent(ibn, idi)
+    deploy!(ibn, idi, MINDF.douninstall, MINDF.SimpleIBNModus(),  MINDF.directuninstall!; time=nexttime())
+end
+
+function uncompile_intent(ibn, idi)
+    deploy!(ibn, idi, MINDF.douncompile, MINDF.SimpleIBNModus(); time=nexttime())
+end
+
+function remove_intent(ibn, idi)
+    remintent!(ibn, idi)
+end
+
 
 function load_ibn(topology)
 
@@ -99,14 +111,14 @@ defaulttransmissionmodules() = [MINDF.TransmissionModuleView("DummyFlexibleTrans
 nexttime() = MINDF.COUNTER("time")u"hr"
 
 
-function longestavailpath!(ibn::IBN, idagnode::IntentDAGNode{R}, ::MINDF.IntraIntent; time, k=100) where {R<:ConnectivityIntent}
+function longestavailpath!(ibn::IBN, idagnode::IntentDAGNode{R}, ::MINDF.IntraIntent; time, k = 100) where {R<:ConnectivityIntent}
     conint = getintent(idagnode)
     source = MINDF.localnode(ibn, getsrc(conint); subnetwork_view=false)
     dest = MINDF.localnode(ibn, getdst(conint); subnetwork_view=false)
 
     yenpaths = yen_k_shortest_paths(MINDF.getgraph(ibn), source, dest, MINDF.linklengthweights(ibn), k)
-    # call an internal function that picks the first available path
-    # use the first fil spectrum alocation algorithm as before (https://ieeexplore.ieee.org/document/6421472)
+	# call an internal function that picks the first available path
+	# use the first fil spectrum alocation algorithm as before (https://ieeexplore.ieee.org/document/6421472)
     MINDF.deployfirstavailablepath!(ibn, idagnode, reverse(yenpaths.paths), reverse(yenpaths.dists); spectrumallocfun=MINDF.firstfit, time)
     return getstate(idagnode)
 end

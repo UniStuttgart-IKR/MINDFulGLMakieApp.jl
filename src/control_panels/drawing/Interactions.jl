@@ -9,8 +9,7 @@ function init_control_panel_drawing(member_variables)
         options=["ibnplot", "intentplot"])
     member_variables.interactables["drawing"]["menus"]["domain_to_draw"] = Menu(fig[1, 1][1, 1][2, 2:5],
         options=["All"])
-    #= member_variables.interactables["drawing"]["menus"]["grid-size"] = Menu(fig[1, 1][1, 1][3, 2:3],
-        options=["2x2", "3x3", "4x4"]) =#
+
 
 
     #Buttons
@@ -39,70 +38,27 @@ function init_control_panel_drawing(member_variables)
         update_menu_colors_drawing(member_variables)
     end
 
-    #= on(member_variables.interactables["drawing"]["buttons"]["pop_out"].clicks) do s
-        #= fig_2 = Figure(resolution=(1800, 1200))
-        println("fig")
-        fig_2 =#
-        
-        #fig = member_variables.fig
-        #fig[1,2] = content(fig[2,1])
-
-
-        #= draw(wrap_current_draw_args_in_dict(member_variables), member_variables; pop_out=true)
-
-        update_menu_colors_drawing(member_variables) =#
-    end =#
-
     on(member_variables.interactables["drawing"]["buttons"]["fullscreen"].clicks) do s
         member_variables.interactables_observables["drawing"]["buttons"]["fullscreen"][] = !member_variables.interactables_observables["drawing"]["buttons"]["fullscreen"][]
         println(member_variables.interactables_observables["drawing"]["buttons"]["fullscreen"][])
     end
 
-    #= on(member_variables.interactables["drawing"]["buttons"]["move"].clicks) do s
-        #f = copy(member_variables.fig)
-        s = readline()
-    end =#
 
     #Menu Listeners
 
-    on(member_variables.interactables["drawing"]["menus"]["loaded_intents"].selection) do s
-        if member_variables.interactables["drawing"]["menus"]["loaded_intents"].i_selected[] != 0
-            #member_variables.interactables_observables["intents"]["menus"]["loaded_intents"][] = s
-
-            #println(find_intent_in_loaded_by_name(member_variables, s)["name"], s, keys(find_intent_in_loaded_by_name(member_variables, s)))
-
-            member_variables.interactables["drawing"]["menus"]["domain_to_draw"].options[] = append!(Any[member_variables.interactables["drawing"]["menus"]["domain_to_draw"].options[][1]],
-                1:get_subnet_amount(find_intent_in_loaded_by_name(member_variables, s)["topology"], member_variables))
-
-
+    on(member_variables.interactables["drawing"]["menus"]["loaded_intents"].i_selected) do s
+        if s > 1
+            member_variables.interactables["drawing"]["menus"]["domain_to_draw"].options[] = append!(
+                Any[member_variables.interactables["drawing"]["menus"]["domain_to_draw"].options[][1]], append!(
+                    Any["All"], [find_intent_in_loaded_by_name(member_variables, member_variables.interactables["drawing"]["menus"]["loaded_intents"].selection[])["ibn_index"]]
+                ))
         end
     end
 
-    #= on(member_variables.interactables["drawing"]["menus"]["grid-size"].selection) do s
-        ind_ar = ["2x2", "3x3", "4x4"]
-        side_length = [2, 3, 4][findfirst(x -> x == s, ind_ar)]
-        member_variables.fig[1:side_length, 1:side_length] = GridLayout()
 
-        member_variables.grid_length = side_length
 
-        member_variables.interactables["drawing"]["menus"]["draw_position"].options = [i for i in 1:member_variables.grid_length*member_variables.grid_length-1]
 
-        delete_all_graphs_from_screen(member_variables)
-        for (k, v) in member_variables.graphs
-            if k > member_variables.grid_length * member_variables.grid_length - 1
-                println("Deleting graph " * string(k) * ", doesn't fit to screen!")
-                delete!(member_variables.graphs[k]["args"]["a"])
-                delete!(member_variables.graphs, k)
-            else
-                draw(member_variables.graphs[k]["args"], member_variables)
-            end
-
-        end
-
-        println(member_variables.fig[1, 2])
-        println(GLMakie.trim!(member_variables.fig.layout))
-
-    end =#
+    #update default labels
 
     prompts = Dict(
         "loaded_intents" => "Loaded Intents",
@@ -111,8 +67,15 @@ function init_control_panel_drawing(member_variables)
         "domain_to_draw" => "Domain to draw"
     )
     for x in keys(prompts)
-        member_variables.interactables["drawing"]["menus"][x].prompt = prompts[x]
-        member_variables.interactables["drawing"]["menus"][x].i_selected[] = 0
+        member_variables.interactables["drawing"]["menus"][x].options[] = append!(Any[prompts[x]], member_variables.interactables["drawing"]["menus"][x].options[])
+        if member_variables.interactables_observables["ui_options"]["toggles"]["save_options_draw"] == true
+            index = member_variables.interactables_observables["drawing"]["menus"][x]
+        else
+            index = 1
+        end
+        println(index, member_variables.interactables_observables["drawing"]["menus"][x])
+        member_variables.interactables["drawing"]["menus"][x].i_selected[] = index
+
     end
 
     #set all colors
@@ -121,6 +84,16 @@ function init_control_panel_drawing(member_variables)
     for x in keys(prompts)
         on(member_variables.interactables["drawing"]["menus"][x].selection) do s
             update_menu_colors_drawing(member_variables)
+        end
+    end
+
+    #update observables
+
+    for x in ["loaded_intents", "draw_position", "intent-visualization", "domain_to_draw"]
+        on(member_variables.interactables["drawing"]["menus"][x].i_selected) do s
+            member_variables.interactables_observables["drawing"]["menus"][x] = s
+            println("set to " .. string(s))
+
         end
     end
 
@@ -160,7 +133,7 @@ function wrap_current_draw_args_in_dict(member_variables)
 end
 
 
-function draw(args, member_variables; pop_out = false)
+function draw(args, member_variables; pop_out=false)
     if args === nothing
         return
     end
@@ -173,7 +146,7 @@ function draw(args, member_variables; pop_out = false)
     pos = args["pos"]
     pos_1, pos_2 = get_pos1_pos2(pos, member_variables.grid_length)
 
-    a = Axis(fig[pos_1, pos_2], title="Graph " * string(pos) * ", " * "Topology: " * args["intent"]["topology"] * ", Domain: " * string(args["domain_to_draw"]) * ", Algo: " * args["intent"]["algo"])
+    a = Axis(fig[pos_1, pos_2], title="Graph " * string(pos) * ", Domain: " * string(args["domain_to_draw"]) *  ", Intent: " * args["intent"]["name"] * ", Algo: " * args["intent"]["algo"])
     member_variables.graphs[pos]["args"]["a"] = a
 
     plot_mindful(args["graph_type"], a, args["intent"]["ibn"], args["intent"]["id"], args["domain_to_draw"])
@@ -184,7 +157,7 @@ function update_menu_colors_drawing(member_variables)
     green_count = 0
 
     for x in keys_
-        if member_variables.interactables["drawing"]["menus"][x].i_selected[] == 0
+        if member_variables.interactables["drawing"]["menus"][x].i_selected[] < 2
             member_variables.interactables["drawing"]["menus"][x].textcolor = colors.red
         else
             member_variables.interactables["drawing"]["menus"][x].textcolor = colors.green

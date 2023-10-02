@@ -40,11 +40,11 @@ function delete_all_interactables_from_screen(member_variables)
 
     for (k, v) in member_variables.interactables
         for (k2, v2) in v
-            if typeof(v2) in [Makie.Menu, Makie.Button, Makie.Textbox]
+            if typeof(v2) in [Makie.Menu, Makie.Button, Makie.Textbox, Makie.Label, Makie.Toggle]
                 delete!(v2)
             else
                 for (k3, v3) in v2
-                    if typeof(v3) in [Makie.Menu, Makie.Button, Makie.Textbox]
+                    if typeof(v3) in [Makie.Menu, Makie.Button, Makie.Textbox, Makie.Label, Makie.Toggle]
                         delete!(v3)
                     end
                 end
@@ -68,14 +68,13 @@ function initialize_control_panel(member_variables)
     delete_all_interactables_from_screen(member_variables)
 
     fig = member_variables.fig
-    member_variables.interactables["general"]["menu"] = Menu(fig[1, 1][1, 1][1, 0:1], options=["Intent Creation", "Intent Actions", "Draw"], default=member_variables.interactables_observables["general"]["menu"][])
+    member_variables.interactables["general"]["menu"] = Menu(fig[1, 1][1, 1][1, 0:1], options=["Intent Creation", "Intent Actions", "Draw", "UI Options"], default=member_variables.interactables_observables["general"]["menu"][])
 
     # check what type of control panel needs to be displayed 
 
     if member_variables.interactables_observables["general"]["menu"][] == "Intent Creation"
         init_control_panel_intents(member_variables)
     elseif member_variables.interactables_observables["general"]["menu"][] == "Draw"
-        println(length(member_variables.loaded_intents))
         if length(member_variables.loaded_intents) > 0
             init_control_panel_drawing(member_variables)
         else
@@ -90,6 +89,9 @@ function initialize_control_panel(member_variables)
             member_variables.interactables_observables["general"]["menu"][] = "Intent Creation"
             initialize_control_panel(member_variables)
         end
+
+    elseif member_variables.interactables_observables["general"]["menu"][] == "UI Options"
+        init_control_panel_ui_options(member_variables)
     end
 
     #add listerners for observables
@@ -130,11 +132,7 @@ function main!(fig)
     on(member_variables.interactables_observables["drawing"]["buttons"]["fullscreen"]) do s
         pos = member_variables.interactables["drawing"]["menus"]["draw_position"].selection[]
         pos_1, pos_2 = get_pos1_pos2(pos, member_variables.grid_length)
-
-
         member_variables.fig[2, 2], member_variables.fig[pos_1, pos_2] = content(member_variables.fig[pos_1, pos_2]), content(member_variables.fig[2, 2])
-
-
         #member_variables.fullscreen_graph = copy(member_variables.graphs)
 
 
@@ -168,22 +166,10 @@ function main!(fig)
         member_variables.fig[1:2, 1:2] = gl_2
         gl_hidden[1:2, 1:2] = gl
 
-        #draw(member_variables.graphs[pos]["args"], member_variables; fullscreen=true)
 
         GLMakie.trim!(fig.layout)
 
     end
-
-    #= on(member_variables.interactables_observables["drawing"]["buttons"]["end_fullscreen"]) do s
-        #delete!(member_variables.fullscreen_graph[1])
-
-        delete!(member_variables.interactables["drawing"]["buttons"]["end_fullscreen"])
-        initialize_control_panel(member_variables)
-
-        #= for (k, v) in member_variables.graphs
-            draw(member_variables.graphs[k]["args"], member_variables)
-        end =#
-    end =#
 
 
     return member_variables.fig
@@ -235,6 +221,12 @@ function init_member_variables!(fig)
                 ),
                 "buttons" => Dict(
                 )
+            ),
+            "ui_options" => Dict(
+                "toggles" => Dict(
+                ),
+                "labels" => Dict(
+                )
             )
         ),
         interactables_observables=Dict(
@@ -243,21 +235,37 @@ function init_member_variables!(fig)
             ),
             "intents" => Dict(
                 "menus" => Dict(
-                    "topology" => Observable("4nets"),
-                    "subnet" => Observable(1),
-                    "node_1" => Observable(1),
-                    "node_1_subnet" => Observable(1),
-                    "node_2" => Observable(1),
-                    "node_2_subnet" => Observable(1),
-                    "speed" => Observable(1),
-                    "intent_list" => Observable(2),
-                    "loaded_intents" => Observable("default intent")
+                    "topology" => 1,
+                    "subnet" => 1,
+                    "node_1" => 1,
+                    "node_1_subnet" => 1,
+                    "node_2" => 1,
+                    "node_2_subnet" => 1,
+                    "ibn" => 1)
+            ),
+            "intent_actions" => Dict(
+                "menus" => Dict(
+                    "loaded_intents" => 1,
+                    "compilation_algorithm" => 1
                 )
             ),
             "drawing" => Dict(
                 "buttons" => Dict(
                     "fullscreen" => Observable(false),
                     "end_fullscreen" => Observable(false)
+                ),
+                "menus" => Dict(
+                    "loaded_intents" => 1,
+                    "draw_position" => 1,
+                    "intent-visualization" => 1,
+                    "domain_to_draw" => 1
+                )
+            ),
+            "ui_options" => Dict(
+                "toggles" => Dict(
+                    "save_options_intent_creation" => true,
+                    "save_options_intent_actions" => true,
+                    "save_options_draw" => true
                 )
             )
         ), displayed_graphs=nothing,
