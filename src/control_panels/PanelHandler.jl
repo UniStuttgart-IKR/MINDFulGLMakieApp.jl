@@ -289,6 +289,7 @@ function startup()
     fig = Figure(resolution=(1800, 1200))
     fig_configured = main!(fig)
     display(fig_configured)
+    set_theme!(fontsize=25)
     #readline()
 
 end

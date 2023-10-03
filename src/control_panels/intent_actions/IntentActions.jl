@@ -15,7 +15,7 @@ function init_control_panel_intent_actions(member_variables)
     member_variables.interactables["intent_actions"]["buttons"]["remove_intent"] = Button(fig[1, 1][1, 1][2, 0:1], label="Remove")
 
     state = get_intent_state(find_intent_in_loaded_by_name(member_variables, member_variables.interactables["intent_actions"]["menus"]["loaded_intents"].selection[]))
-    member_variables.interactables["intents"]["buttons"]["intent_state"] = Button(fig[1, 1][1, 1][3, 4:5], label="State: " * string(state.state), buttoncolor=RGBf(1, 1, 1), buttoncolor_active=RGBf(1, 1, 1), buttoncolor_hover=RGBf(1, 1, 1))
+    member_variables.interactables["intents"]["buttons"]["intent_state"] = Button(fig[1, 1][1, 1][5, 0:3], label="State: " * string(state.state), buttoncolor=RGBf(1, 1, 1), buttoncolor_active=RGBf(1, 1, 1), buttoncolor_hover=RGBf(1, 1, 1))
 
 
 
