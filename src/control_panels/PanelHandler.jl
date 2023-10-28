@@ -132,21 +132,25 @@ function main!(fig)
     on(member_variables.interactables_observables["drawing"]["buttons"]["fullscreen"]) do s
         pos = member_variables.interactables["drawing"]["menus"]["draw_position"].selection[]
         pos_1, pos_2 = get_pos1_pos2(pos, member_variables.grid_length)
-        member_variables.fig[2, 2], member_variables.fig[pos_1, pos_2] = content(member_variables.fig[pos_1, pos_2]), content(member_variables.fig[2, 2])
-        #member_variables.fullscreen_graph = copy(member_variables.graphs)
 
+        
 
-        #println(pos_1, pos_2)
-        #
+        try
+            gl_hidden[2, 1] = content(member_variables.fig[2, 1])
+        catch
+        end
+        try
+            gl_hidden[1, 2] = content(member_variables.fig[1, 2])
+        catch
+        end
+        try
+            gl_hidden[2, 2] = content(member_variables.fig[2, 2])
+        catch
+        end
 
-        #gl_2[2,1] = fullscreen_graph
-        #gl_2[2,2] = fullscreen_graph
+        member_variables.fig[2, 1:2] = content(gl_hidden[pos_1, pos_2])
 
-
-        #delete_all_interactables_from_screen(member_variables)
-        #delete_all_graphs_from_screen(member_variables)
-
-        #member_variables.fig[2, 2] = fullscreen_graph
+        gl_hidden[1, 1][1, 1] = content(member_variables.fig[1, 1][1, 1])
 
         member_variables.interactables["drawing"]["buttons"]["end_fullscreen"] = Button(fig[1, 1], label="End Fullscreen")
         on(member_variables.interactables["drawing"]["buttons"]["end_fullscreen"].clicks) do r
@@ -155,10 +159,30 @@ function main!(fig)
             #init_control_panel_drawing(member_variables)
 
             #gl[pos_1, pos_2] = fullscreen_graph
+
+
+            gl_hidden[pos_1, pos_2] = content(member_variables.fig[2, 1:2])
+
+            try
+                member_variables.fig[2, 1] = content(gl_hidden[2, 1])
+            catch
+            end
+            try
+                member_variables.fig[1, 2] = content(gl_hidden[1, 2])
+            catch
+            end
+            try
+                member_variables.fig[2, 2] = content(gl_hidden[2, 2])
+            catch
+            end
+            member_variables.fig[1, 1][1, 1] = content(gl_hidden[1, 1][1, 1])
+
             member_variables.fig[1:2, 1:2] = gl
             gl_hidden[1:2, 1:2] = gl_2
 
-            member_variables.fig[2, 2], member_variables.fig[pos_1, pos_2] = content(member_variables.fig[pos_1, pos_2]), content(member_variables.fig[2, 2])
+
+
+
         end
 
 
@@ -241,7 +265,7 @@ function init_member_variables!(fig)
                     "node_1_subnet" => 1,
                     "node_2" => 1,
                     "node_2_subnet" => 1,
-                    "ibn" => 1)
+                    "ibn" => 2)
             ),
             "intent_actions" => Dict(
                 "menus" => Dict(
