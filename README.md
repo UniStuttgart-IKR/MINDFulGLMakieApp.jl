@@ -41,11 +41,10 @@ To run this project
 
 
 ## Screenshots
-
-![App Screenshot](https://github.com/Niels1006/MINDFulGLMakieApp.jl-1/assets/16525967/3ea3c678-493e-44ed-8ded-2f0adb175751)
+![App Screenshot](https://github.com/Niels1006/MINDFulGLMakieApp.jl-1/assets/16525967/f6f98271-5ded-4bee-b351-18bb25fb80ab)
 Create intents.
 
-![App Screenshot](https://github.com/Niels1006/MINDFulGLMakieApp.jl-1/assets/16525967/649a6db2-33cf-4701-a829-2926fe8c1747)
+![App Screenshot](https://github.com/Niels1006/MINDFulGLMakieApp.jl-1/assets/16525967/107862cd-7f93-4ac3-be4e-bf2208de2317)
 Change the intent's state.
 
 ![App Screenshot](https://github.com/Niels1006/MINDFulGLMakieApp.jl-1/assets/16525967/be186721-62d7-4d5e-a1dc-c713406172ca)
