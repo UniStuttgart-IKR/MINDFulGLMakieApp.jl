@@ -99,7 +99,6 @@ function initialize_control_panel(member_variables)
         for (k2, v2) in v
             if typeof(v2) == Makie.Menu
                 on(v2.selection) do s
-                    println(s)
                     member_variables.interactables_observables[k][k2][] = s
                 end
             end
@@ -113,7 +112,7 @@ end
 
 
 function main!(fig)
-    #@async serve_repl()
+    @info "Starting"
 
     member_variables = init_member_variables!(fig)
 
@@ -313,8 +312,7 @@ function startup()
     fig = Figure(resolution=(1800, 1200))
     fig_configured = main!(fig)
     display(fig_configured)
-    set_theme!(fontsize=25)
-    #readline()
+    set_theme!(fontsize=20)
 
 end
 
