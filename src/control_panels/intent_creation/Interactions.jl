@@ -21,24 +21,13 @@ end
 
 function init_control_panel_intents(member_variables)
     fig = member_variables.fig
+
     #Menus
-
-
-
-
     member_variables.interactables["intents"]["menus"]["topology"] = Menu(fig[1, 1][1, 1][1, 2:5])
-
     member_variables.interactables["intents"]["menus"]["node_1"] = Menu(fig[1, 1][1, 1][2, 2:3], options=["Domain NA"])
     member_variables.interactables["intents"]["menus"]["node_1_subnet"] = Menu(fig[1, 1][1, 1][2, 0:1], options=["Topology NA"])
     member_variables.interactables["intents"]["menus"]["node_2"] = Menu(fig[1, 1][1, 1][3, 2:3], options=["Domain NA"])
     member_variables.interactables["intents"]["menus"]["node_2_subnet"] = Menu(fig[1, 1][1, 1][3, 0:1], options=["Topology NA"])
-
-
-    #= if length(member_variables.ibns) > 0
-        member_variables.interactables["intents"]["menus"]["ibn"] = Menu(fig[1, 1][1, 1][2, 4:5], options=[["New Net"]; [v["name"] for v in member_variables.ibns]])
-    else
-        member_variables.interactables["intents"]["menus"]["ibn"] = Menu(fig[1, 1][1, 1][2, 4:5], options=["New Net"])
-    end =#
 
     #Buttons
     member_variables.interactables["intents"]["buttons"]["create_new_intent"] = Button(fig[1, 1][1, 1][3, 4:5], label="Create")
@@ -47,11 +36,8 @@ function init_control_panel_intents(member_variables)
 
     #text boxes
     member_variables.interactables["intents"]["textboxes"]["add_topology_path"] = Textbox(fig[1, 1][1, 1][4, 0:3], placeholder="Path to .graphml file", reset_on_defocus=true)
-    #member_variables.interactables["intents"]["textboxes"]["speed"] = Textbox(fig[1, 1][1, 1][4, 0:1], placeholder="Speed in Gbps", reset_on_defocus=true)
-
 
     #Add labels to Menus
-
     names = Dict(
         "node_1" => "Node 1",
         "node_1_subnet" => "Domain 1",
@@ -68,7 +54,6 @@ function init_control_panel_intents(member_variables)
     end
 
     #Textbox Listeners
-
     on(member_variables.interactables["intents"]["textboxes"]["add_topology_path"].stored_string) do s
         if s != member_variables.interactables["intents"]["textboxes"]["add_topology_path"].placeholder[]
             member_variables.interactables["intents"]["textboxes"]["add_topology_path"].stored_string = member_variables.interactables["intents"]["textboxes"]["add_topology_path"].placeholder[]
@@ -104,43 +89,9 @@ function init_control_panel_intents(member_variables)
         end
 
         intent_name = _v["topology"].selection[] * " #" * string(counter) * ": " * string(_v["node_1_subnet"].selection[]) * "." * string(_v["node_1"].selection[]) * "->" * string(_v["node_2_subnet"].selection[]) * "." * string(_v["node_2"].selection[])
-        #intent_name = _v["topology"].selection[] * ", " * string(idi.value, base=16)
         append!(member_variables.ibns, [Dict("name" => intent_name, "ibn" => ibn)])
-        #member_variables.interactables["intents"]["menus"]["ibn"].options = [member_variables.interactables["intents"]["menus"]["ibn"].options[]; name]
-
-
-
-        #= else
-            ibn_ar_index = findall(x -> x["name"] == member_variables.interactables["intents"]["menus"]["ibn"].selection[], member_variables.ibns)[1]
-
-
-            idi, ibn = init_intent(_v["node_1"].selection[],
-                _v["node_1_subnet"].selection[],
-                _v["node_2"].selection[],
-                _v["node_2_subnet"].selection[],
-                #_v["speed"].selection[],
-                _v["topology"].selection[],
-                _v["subnet"].selection[],
-                member_variables,
-                myibns=member_variables.ibns[ibn_ar_index]["ibn"])
-
-            intent_name = member_variables.ibns[ibn_ar_index]["name"] * ", " * string(idi.value, base=16) =#
-
-
-
-
-
-
-
-
         append!(member_variables.loaded_intents, [Dict("id" => idi, "ibn" => ibn, "name" => intent_name, "algo" => "", "topology" => _v["topology"].selection[], "ibn_index" => _v["node_1_subnet"].selection[])])
-        #member_variables.interactables["intents"]["menus"]["loaded_intents"].options = [member_variables.interactables["intents"]["menus"]["loaded_intents"].options[]; intent_name]
-
-
-        #= for _a in ["node_1", "node_1_subnet", "node_2", "node_2_subnet", "topology", "subnet", "speed"]
-            println(_a, ":   ", _v[_a].selection[])
-        end =#
-
+        
         @info "Created intent."
 
 
@@ -153,12 +104,6 @@ function init_control_panel_intents(member_variables)
         delete_toplogy_from_file(top["path"])
         reload_toplogies(member_variables)
     end
-
-
-    #= on(member_variables.interactables["intents"]["buttons"]["refresh_top"].clicks) do s
-        member_variables.interactables["intents"]["menus"]["topology"].options[] = get_graph_names()
-    end
-    =#
 
     #Menu Listeners
 
@@ -215,8 +160,6 @@ function init_control_panel_intents(member_variables)
 
     #Load saved menu options
     if member_variables.interactables_observables["ui_options"]["toggles"]["save_options_intent_creation"] == true
-        #member_variables.interactables["intents"]["menus"]["topology"].i_selected[] = member_variables.interactables_observables["intents"]["menus"]["topology"]
-        #member_variables.interactables["intents"]["menus"]["node_1_subnet"].i_selected[] = 3
 
         for x in ["topology", "node_1_subnet", "node_1", "node_2_subnet", "node_2"]
             member_variables.interactables["intents"]["menus"][x].i_selected[] = member_variables.interactables_observables["intents"]["menus"][x]
@@ -234,8 +177,6 @@ function reload_toplogies(member_variables)
     member_variables.interactables["intents"]["menus"]["topology"].i_selected = 1
 
     topologies = get_topologies_from_file()
-
-
 
     new_top_ar = Dict[]
 

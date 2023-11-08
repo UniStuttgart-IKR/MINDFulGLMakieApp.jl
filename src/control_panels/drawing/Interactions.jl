@@ -1,6 +1,6 @@
 function init_control_panel_drawing(member_variables)
     fig = member_variables.fig
-    #Menus
+    #Create Menus
     member_variables.interactables["drawing"]["menus"]["loaded_intents"] = Menu(fig[1, 1][1, 1][1, 2:5],
         options=[v["name"] for v in member_variables.loaded_intents])
     member_variables.interactables["drawing"]["menus"]["draw_position"] = Menu(fig[1, 1][1, 1][4, 2:5],
@@ -12,18 +12,12 @@ function init_control_panel_drawing(member_variables)
 
 
 
-    #Buttons
+    #Create Buttons
     member_variables.interactables["drawing"]["buttons"]["draw"] = Button(fig[1, 1][1, 1][2, 0:1], label="Draw")
-    #member_variables.interactables["drawing"]["buttons"]["pop_out"] = Button(fig[1, 1][1, 1][3, 0:1], label="Pop out draw")
     member_variables.interactables["drawing"]["buttons"]["delete"] = Button(fig[1, 1][1, 1][4, 0:1], label="Delete")
     member_variables.interactables["drawing"]["buttons"]["fullscreen"] = Button(fig[1, 1][1, 1][3, 0:1], label="Fullscreen")
 
-    #member_variables.interactables["drawing"]["buttons"]["move"] = Button(fig[1, 1][1, 1][5, 4:5], label="Move")
-
-
-
-
-    #Button Listeners
+    #Create Button Listeners
     on(member_variables.interactables["drawing"]["buttons"]["draw"].clicks) do s
         draw(wrap_current_draw_args_in_dict(member_variables), member_variables)
 
@@ -56,8 +50,7 @@ function init_control_panel_drawing(member_variables)
     end
 
 
-    #Menu Listeners
-
+    #Create Menu Listeners
     on(member_variables.interactables["drawing"]["menus"]["loaded_intents"].i_selected) do s
         if s > 1
             if member_variables.interactables["drawing"]["menus"]["intent-visualization"].i_selected[] == 3

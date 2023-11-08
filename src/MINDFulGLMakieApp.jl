@@ -6,8 +6,6 @@ module MINDFulGLMakieApp
 
     const MINDF = MINDFul
 
-    #@async serve_repl()
-
     include("etc/HelpFunctions.jl")
     include("control_panels/PanelHandler.jl")
     include("control_panels/intent_creation/Interactions.jl")

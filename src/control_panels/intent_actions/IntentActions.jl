@@ -1,14 +1,12 @@
 function init_control_panel_intent_actions(member_variables)
     fig = member_variables.fig
-    #Menus
+    #Create Menus
     member_variables.interactables["intent_actions"]["menus"]["loaded_intents"] = Menu(fig[1, 1][1, 1][1, 2:5],
         options=[v["name"] for v in member_variables.loaded_intents])
     member_variables.interactables["intent_actions"]["menus"]["compilation_algorithm"] = Menu(fig[1, 1][1, 1][2, 2:5],
-        #options=["shortestavailpath", "jointrmsagenerilizeddijkstra", "longestavailpath"])
         options=["shortestavailpath"])
 
-    #Buttons
-
+    #Create Buttons
     member_variables.interactables["intent_actions"]["buttons"]["deploy_intent"] = Button(fig[1, 1][1, 1][3, 0:1], label="Compile")
     member_variables.interactables["intent_actions"]["buttons"]["install_intent"] = Button(fig[1, 1][1, 1][4, 0:1], label="Install")
     member_variables.interactables["intent_actions"]["buttons"]["uninstall_intent"] = Button(fig[1, 1][1, 1][4, 2:3], label="Uninstall")
@@ -20,7 +18,7 @@ function init_control_panel_intent_actions(member_variables)
 
 
 
-    #Button Listeners
+    #Create Button Listeners
     on(member_variables.interactables["intent_actions"]["buttons"]["deploy_intent"].clicks) do s
         intent = find_intent_in_loaded_by_name(member_variables, member_variables.interactables["intent_actions"]["menus"]["loaded_intents"].selection[])
         algorithm = member_variables.interactables["intent_actions"]["menus"]["compilation_algorithm"].selection[]
@@ -80,7 +78,7 @@ function init_control_panel_intent_actions(member_variables)
 
     end
 
-    #Menu Listeners
+    #Create Menu Listeners
     on(member_variables.interactables["intent_actions"]["menus"]["loaded_intents"].selection) do s
         if member_variables.interactables["intent_actions"]["menus"]["loaded_intents"].i_selected[] != 1
             update_displayed_intent_state(member_variables; intent=find_intent_in_loaded_by_name(member_variables, s))
@@ -89,7 +87,6 @@ function init_control_panel_intent_actions(member_variables)
 
 
     #change default labels and load defaults if needed
-
     prompts = Dict(
         "loaded_intents" => "Loaded Intents",
         "compilation_algorithm" => "Compilation Algorithm"
