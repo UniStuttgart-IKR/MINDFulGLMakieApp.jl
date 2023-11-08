@@ -134,6 +134,5 @@ end
 
 
 function get_nodes_of_subdomain(ibn)
-    #println(fieldnames(typeof(ibn)))
     return MINDFul.getmynodes(ibn)
 end

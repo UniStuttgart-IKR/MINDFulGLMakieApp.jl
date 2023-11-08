@@ -5,8 +5,6 @@ MINDFulGraphs:
 - Date: 2023-07-11
 =#
 
-#module MINDFulGraphs
-
 using MINDFul, GraphIO, NestedGraphsIO, NestedGraphs, Graphs, MetaGraphs
 
 using MINDFulMakie, GLMakie, Unitful
@@ -18,8 +16,6 @@ function get_subnet_amount(topology, member_variables)
             path = x["path"]
         end
     end
-
-    #topology *= ".graphml"
 
     MINDF = MINDFul
     defaultlinecards() = [MINDF.LineCardDummy(10, 100, 26.72), MINDF.LineCardDummy(2, 400, 29.36), MINDF.LineCardDummy(1, 1000, 31.99)]

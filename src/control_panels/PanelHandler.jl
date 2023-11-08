@@ -71,7 +71,6 @@ function initialize_control_panel(member_variables)
     member_variables.interactables["general"]["menu"] = Menu(fig[1, 1][1, 1][1, 0:1], options=["Intent Creation", "Intent Actions", "Draw", "UI Options"], default=member_variables.interactables_observables["general"]["menu"][])
 
     # check what type of control panel needs to be displayed 
-
     if member_variables.interactables_observables["general"]["menu"][] == "Intent Creation"
         init_control_panel_intents(member_variables)
     elseif member_variables.interactables_observables["general"]["menu"][] == "Draw"
@@ -131,9 +130,6 @@ function main!(fig)
     on(member_variables.interactables_observables["drawing"]["buttons"]["fullscreen"]) do s
         pos = member_variables.interactables["drawing"]["menus"]["draw_position"].selection[]
         pos_1, pos_2 = get_pos1_pos2(pos, member_variables.grid_length)
-
-        
-
         try
             gl_hidden[2, 1] = content(member_variables.fig[2, 1])
         catch
@@ -155,10 +151,6 @@ function main!(fig)
         on(member_variables.interactables["drawing"]["buttons"]["end_fullscreen"].clicks) do r
             member_variables.interactables_observables["drawing"]["buttons"]["end_fullscreen"][] = !member_variables.interactables_observables["drawing"]["buttons"]["end_fullscreen"][]
             delete!(member_variables.interactables["drawing"]["buttons"]["end_fullscreen"])
-            #init_control_panel_drawing(member_variables)
-
-            #gl[pos_1, pos_2] = fullscreen_graph
-
 
             gl_hidden[pos_1, pos_2] = content(member_variables.fig[2, 1:2])
 
@@ -178,17 +170,12 @@ function main!(fig)
 
             member_variables.fig[1:2, 1:2] = gl
             gl_hidden[1:2, 1:2] = gl_2
-
-
-
-
         end
 
 
 
         member_variables.fig[1:2, 1:2] = gl_2
         gl_hidden[1:2, 1:2] = gl
-
 
         GLMakie.trim!(fig.layout)
 
