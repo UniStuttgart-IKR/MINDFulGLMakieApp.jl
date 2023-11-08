@@ -32,6 +32,12 @@ function init_control_panel_drawing(member_variables)
 
     on(member_variables.interactables["drawing"]["buttons"]["delete"].clicks) do s
         pos = member_variables.interactables["drawing"]["menus"]["draw_position"].selection[]
+
+        if !(pos in keys(member_variables.graphs))
+            @warn "No available graph!"
+            return
+        end
+
         delete!(member_variables.graphs[pos]["args"]["a"])
         delete!(member_variables.graphs, pos)
 
@@ -42,12 +48,11 @@ function init_control_panel_drawing(member_variables)
         pos = member_variables.interactables["drawing"]["menus"]["draw_position"].selection[]
         #check if there is a graph
         if !(pos in keys(member_variables.graphs))
-            println("No available graph!")
+            @warn "No available graph!"
             return
         end
 
         member_variables.interactables_observables["drawing"]["buttons"]["fullscreen"][] = !member_variables.interactables_observables["drawing"]["buttons"]["fullscreen"][]
-        println(member_variables.interactables_observables["drawing"]["buttons"]["fullscreen"][])
     end
 
 
@@ -87,7 +92,7 @@ function init_control_panel_drawing(member_variables)
             end
         catch
         end
-        
+
     end
 
 
@@ -108,7 +113,6 @@ function init_control_panel_drawing(member_variables)
         else
             index = 1
         end
-        println(index, member_variables.interactables_observables["drawing"]["menus"][x])
         member_variables.interactables["drawing"]["menus"][x].i_selected[] = index
 
     end
@@ -127,8 +131,6 @@ function init_control_panel_drawing(member_variables)
     for x in ["loaded_intents", "draw_position", "intent-visualization", "domain_to_draw"]
         on(member_variables.interactables["drawing"]["menus"][x].i_selected) do s
             member_variables.interactables_observables["drawing"]["menus"][x] = s
-            println("set to " .. string(s))
-
         end
     end
 
@@ -145,7 +147,7 @@ function wrap_current_draw_args_in_dict(member_variables)
     end
 
     if pos in keys(member_variables.graphs)
-        println("Not clear canvas!")
+        @warn "Not clear canvas!"
         return
     end
 

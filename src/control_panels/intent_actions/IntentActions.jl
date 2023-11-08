@@ -4,7 +4,8 @@ function init_control_panel_intent_actions(member_variables)
     member_variables.interactables["intent_actions"]["menus"]["loaded_intents"] = Menu(fig[1, 1][1, 1][1, 2:5],
         options=[v["name"] for v in member_variables.loaded_intents])
     member_variables.interactables["intent_actions"]["menus"]["compilation_algorithm"] = Menu(fig[1, 1][1, 1][2, 2:5],
-        options=["shortestavailpath", "jointrmsagenerilizeddijkstra", "longestavailpath"])
+        #options=["shortestavailpath", "jointrmsagenerilizeddijkstra", "longestavailpath"])
+        options=["shortestavailpath"])
 
     #Buttons
 
@@ -26,7 +27,7 @@ function init_control_panel_intent_actions(member_variables)
 
         intent["algo"] = algorithm
 
-        deploy_intent(intent["ibn"][1], intent["id"], algorithm)
+        deploy_intent(intent["ibn"][intent["ibn_index"]], intent["id"], algorithm)
         update_displayed_intent_state(member_variables, intent=intent)
 
         update_compile_and_install_button_color(member_variables)
@@ -35,7 +36,7 @@ function init_control_panel_intent_actions(member_variables)
     on(member_variables.interactables["intent_actions"]["buttons"]["install_intent"].clicks) do s
         intent = find_intent_in_loaded_by_name(member_variables, member_variables.interactables["intent_actions"]["menus"]["loaded_intents"].selection[])
 
-        install_intent(intent["ibn"][1], intent["id"])
+        install_intent(intent["ibn"][intent["ibn_index"]], intent["id"])
         update_displayed_intent_state(member_variables, intent=intent)
 
         update_compile_and_install_button_color(member_variables)
@@ -44,7 +45,7 @@ function init_control_panel_intent_actions(member_variables)
     on(member_variables.interactables["intent_actions"]["buttons"]["uninstall_intent"].clicks) do s
         intent = find_intent_in_loaded_by_name(member_variables, member_variables.interactables["intent_actions"]["menus"]["loaded_intents"].selection[])
 
-        uninstall_intent(intent["ibn"][1], intent["id"])
+        uninstall_intent(intent["ibn"][intent["ibn_index"]], intent["id"])
         update_displayed_intent_state(member_variables, intent=intent)
 
         update_compile_and_install_button_color(member_variables)
@@ -53,7 +54,7 @@ function init_control_panel_intent_actions(member_variables)
     on(member_variables.interactables["intent_actions"]["buttons"]["uncompile_intent"].clicks) do s
         intent = find_intent_in_loaded_by_name(member_variables, member_variables.interactables["intent_actions"]["menus"]["loaded_intents"].selection[])
 
-        uncompile_intent(intent["ibn"][1], intent["id"])
+        uncompile_intent(intent["ibn"][intent["ibn_index"]], intent["id"])
         update_displayed_intent_state(member_variables, intent=intent)
 
         update_compile_and_install_button_color(member_variables)
@@ -62,7 +63,7 @@ function init_control_panel_intent_actions(member_variables)
     on(member_variables.interactables["intent_actions"]["buttons"]["remove_intent"].clicks) do s
         intent = find_intent_in_loaded_by_name(member_variables, member_variables.interactables["intent_actions"]["menus"]["loaded_intents"].selection[])
 
-        remove_intent(intent["ibn"][1], intent["id"])
+        remove_intent(intent["ibn"][intent["ibn_index"]], intent["id"])
 
         len = delete_intent_by_name_at(member_variables, intent["name"])
         if len > 0
@@ -122,8 +123,8 @@ end
 
 function reload_loaded_intent_menu(member_variables)
     member_variables.interactables["intent_actions"]["menus"]["loaded_intents"].options[] = append!(String[
-        member_variables.interactables["intent_actions"]["menus"]["loaded_intents"].options[][1]
-    ], [v["name"] for v in member_variables.loaded_intents])
+            member_variables.interactables["intent_actions"]["menus"]["loaded_intents"].options[][1]
+        ], [v["name"] for v in member_variables.loaded_intents])
 
 end
 
@@ -143,7 +144,7 @@ function find_intent_in_loaded_by_name(member_variables, name)
 end
 
 function get_intent_state(intent)
-    return getintentnode(intent["ibn"][1], intent["id"])
+    return getintentnode(intent["ibn"][intent["ibn_index"]], intent["id"])
 end
 
 function update_displayed_intent_state(member_variables; state=nothing, intent=nothing)
@@ -177,8 +178,6 @@ function update_compile_and_install_button_color(member_variables)
     if member_variables.interactables["intent_actions"]["menus"]["loaded_intents"].i_selected[] > 1
         intent = find_intent_in_loaded_by_name(member_variables, member_variables.interactables["intent_actions"]["menus"]["loaded_intents"].selection[])
         intent_state = string(get_intent_state(intent).state)
-
-        println(intent_state)
 
         if intent_state == "uncompiled"
             member_variables.interactables["intent_actions"]["buttons"]["remove_intent"].labelcolor = colors.green

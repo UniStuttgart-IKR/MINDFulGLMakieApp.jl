@@ -2,7 +2,6 @@ export MINDFulGLMakieApp
 
 module MINDFulGLMakieApp
     using GLMakie
-    using RemoteREPL
     using MINDFul
 
     const MINDF = MINDFul
