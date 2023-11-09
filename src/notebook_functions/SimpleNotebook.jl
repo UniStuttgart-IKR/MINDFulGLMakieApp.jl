@@ -2,6 +2,7 @@ using MINDFul, GraphIO, NestedGraphsIO, NestedGraphs, Graphs, MetaGraphs
 
 using MINDFulMakie, GLMakie, Unitful
 
+#functions from https://unistuttgart-ikr.github.io/MINDFulNotebookExamples.jl/simplenotebookexample.html
 
 function plot_mindful(plot_type, axis, ibn, idi, domain)
     if plot_type == "intentplot"

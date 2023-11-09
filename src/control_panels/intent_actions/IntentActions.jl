@@ -119,6 +119,7 @@ function init_control_panel_intent_actions(member_variables)
 end
 
 function reload_loaded_intent_menu(member_variables)
+    #update menu options for loaded intents
     member_variables.interactables["intent_actions"]["menus"]["loaded_intents"].options[] = append!(String[
             member_variables.interactables["intent_actions"]["menus"]["loaded_intents"].options[][1]
         ], [v["name"] for v in member_variables.loaded_intents])
@@ -126,6 +127,7 @@ function reload_loaded_intent_menu(member_variables)
 end
 
 function delete_intent_by_name_at(member_variables, name)
+    #delete specified intent from
     loaded_intent_ar_index = findall(x -> x["name"] == name, member_variables.loaded_intents)[1]
     deleteat!(member_variables.loaded_intents, loaded_intent_ar_index)
 
@@ -134,6 +136,7 @@ function delete_intent_by_name_at(member_variables, name)
 end
 
 function find_intent_in_loaded_by_name(member_variables, name)
+    #find loaded intent
     loaded_intent_ar_index = findall(x -> x["name"] == name, member_variables.loaded_intents)[1]
     intent = member_variables.loaded_intents[loaded_intent_ar_index]
 
@@ -141,10 +144,12 @@ function find_intent_in_loaded_by_name(member_variables, name)
 end
 
 function get_intent_state(intent)
+    #gets the current intent state
     return getintentnode(intent["ibn"][intent["ibn_index"]], intent["id"])
 end
 
 function update_displayed_intent_state(member_variables; state=nothing, intent=nothing)
+    #updates label with current intent state
     if state === nothing
         state = get_intent_state(intent)
     end
@@ -153,6 +158,7 @@ function update_displayed_intent_state(member_variables; state=nothing, intent=n
 end
 
 function update_menu_colors_ia(member_variables)
+    #update all menu colors for site intent actions
     keys = ["loaded_intents", "compilation_algorithm"]
     green_count = 0
     for x in keys
@@ -172,6 +178,7 @@ function update_menu_colors_ia(member_variables)
 end
 
 function update_compile_and_install_button_color(member_variables)
+    #update button colors
     if member_variables.interactables["intent_actions"]["menus"]["loaded_intents"].i_selected[] > 1
         intent = find_intent_in_loaded_by_name(member_variables, member_variables.interactables["intent_actions"]["menus"]["loaded_intents"].selection[])
         intent_state = string(get_intent_state(intent).state)
