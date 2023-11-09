@@ -54,6 +54,7 @@ end
 function deploy_intent(ibn, idi, algorithm)
     if algorithm == "shortestavailpath"
         algo = MINDF.shortestavailpath!
+    #those algos are not fully implemented yet
     elseif algorithm == "jointrmsagenerilizeddijkstra"
         algo = MINDFulCompanion.jointrmsagenerilizeddijkstra!
     elseif algorithm == "longestavailpath"
