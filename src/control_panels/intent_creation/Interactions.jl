@@ -1,5 +1,6 @@
 
 function add_intent_to_member_variables(member_variables, n1, n1_sn, n2, n2_sn, speed, topology, sn, name="Your intent")
+    #deprecated
     dict = Dict(
         "name" => name,
         "node_1" => n1,
@@ -174,6 +175,7 @@ function init_control_panel_intents(member_variables)
 end
 
 function reload_toplogies(member_variables)
+    #reloads topologies
     member_variables.interactables["intents"]["menus"]["topology"].i_selected = 1
 
     topologies = get_topologies_from_file()
@@ -203,6 +205,7 @@ function reload_toplogies(member_variables)
 end
 
 function update_menu_colors_ic(member_variables)
+    #update menu colors for site intent creation
     keys = ["node_1", "node_1_subnet", "node_2", "node_2_subnet", "topology"]
     green_count = 0
 

@@ -132,6 +132,7 @@ function init_control_panel_drawing(member_variables)
 end
 
 function wrap_current_draw_args_in_dict(member_variables)
+    #wrap needed args in dict
     pos = member_variables.interactables["drawing"]["menus"]["draw_position"].selection[]
     graph_type = member_variables.interactables["drawing"]["menus"]["intent-visualization"].selection[]
     domain_to_draw = member_variables.interactables["drawing"]["menus"]["domain_to_draw"].selection[]
@@ -164,6 +165,7 @@ end
 
 
 function draw(args, member_variables; pop_out=false)
+    #draw graph to position
     if args === nothing
         return
     end
@@ -183,6 +185,7 @@ function draw(args, member_variables; pop_out=false)
 end
 
 function update_menu_colors_drawing(member_variables)
+    #update menu text colors
     keys_ = ["loaded_intents", "draw_position", "intent-visualization", "domain_to_draw"]
     green_count = 0
 

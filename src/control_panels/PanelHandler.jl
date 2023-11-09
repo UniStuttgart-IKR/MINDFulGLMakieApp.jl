@@ -9,7 +9,7 @@ global colors = Colors_(
 )
 
 
-
+#mutable struct for passing around variables
 Base.@kwdef mutable struct MemberVariables
     fig
 
@@ -37,7 +37,7 @@ function generate_grid_layout!(fig)
 end
 
 function delete_all_interactables_from_screen(member_variables)
-
+    #delete all interactables from screen
     for (k, v) in member_variables.interactables
         for (k2, v2) in v
             if typeof(v2) in [Makie.Menu, Makie.Button, Makie.Textbox, Makie.Label, Makie.Toggle]
@@ -54,6 +54,7 @@ function delete_all_interactables_from_screen(member_variables)
 end
 
 function delete_all_graphs_from_screen(member_variables)
+    #delete all graphs from screen
     for (k, v) in member_variables.graphs
         delete!(member_variables.graphs[k]["args"]["a"])
     end
@@ -64,7 +65,7 @@ end
 
 
 function initialize_control_panel(member_variables)
-
+    #create control panel
     delete_all_interactables_from_screen(member_variables)
 
     fig = member_variables.fig
@@ -128,6 +129,7 @@ function main!(fig)
     end
 
     on(member_variables.interactables_observables["drawing"]["buttons"]["fullscreen"]) do s
+        #show one plot in fullscreen mode
         pos = member_variables.interactables["drawing"]["menus"]["draw_position"].selection[]
         pos_1, pos_2 = get_pos1_pos2(pos, member_variables.grid_length)
         try
@@ -172,18 +174,13 @@ function main!(fig)
             gl_hidden[1:2, 1:2] = gl_2
         end
 
-
-
         member_variables.fig[1:2, 1:2] = gl_2
         gl_hidden[1:2, 1:2] = gl
 
         GLMakie.trim!(fig.layout)
-
     end
 
-
     return member_variables.fig
-
 
 end
 
@@ -296,10 +293,11 @@ function init_member_variables!(fig)
 end
 
 function startup()
+    #start the GUI Wrapper
     fig = Figure(resolution=(1800, 1200))
     fig_configured = main!(fig)
     display(fig_configured)
-    set_theme!(fontsize=20)
+    set_theme!(fontsize=20) #fontsize can get changed
 
 end
 

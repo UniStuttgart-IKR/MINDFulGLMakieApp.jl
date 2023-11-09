@@ -1,6 +1,7 @@
 
 
 function get_graph_names()
+    #get all graph names in data/
     files = readdir("data/")
     println("Available topologies: " * join(files, ", "))
 
@@ -14,6 +15,7 @@ end
 
 
 function get_pos1_pos2(pos, grid_length)
+    #convert pos into (x,y)
     if grid_length == 2
         return [2, 1, 2][pos], [1, 2, 2][pos]
     elseif grid_length == 3
@@ -24,6 +26,7 @@ function get_pos1_pos2(pos, grid_length)
 end
 
 function parse_int_from_string(str)
+    #parse int to string
     try
         parsed = parse(Int64, str)
         return parsed
@@ -33,11 +36,13 @@ function parse_int_from_string(str)
 end
 
 function set_menu_selected(menu; i=1)
+    # set i_selected to 1
     menu.i_selected = 1
 end
 
 
 function append_toplogy_to_file(path)
+    #add topology to top file
     tops = get_topologies_from_file()
     if path in tops
         return false
@@ -51,6 +56,7 @@ function append_toplogy_to_file(path)
 end
 
 function delete_toplogy_from_file(path)
+    #delete top from top file
     tops = get_topologies_from_file()
     deleteat!(tops, findfirst(x -> x == path, tops))
     tops_string = join(tops, "\n")
@@ -63,6 +69,7 @@ function delete_toplogy_from_file(path)
 end
 
 function get_topologies_from_file()
+    #get all tops from file
     topologies = String[]
     open(joinpath("data/topologies.txt"), "r") do file
         s = read(file, String)
